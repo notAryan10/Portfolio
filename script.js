@@ -103,15 +103,50 @@ class Node {
         this.vx = (Math.random() - 0.5) * 0.5;
         this.vy = (Math.random() - 0.5) * 0.5;
         this.radius = Math.random() * 1.5;
+        this.baseRadius = this.radius;  // Store original radius
+        this.targetRadius = this.radius;  // For smooth radius transitions
     }
 
     update() {
+        // Smooth radius transition
+        this.radius += (this.targetRadius - this.radius) * 0.1;
+
         this.x += this.vx;
         this.y += this.vy;
 
         // Bounce off edges
         if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
         if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+
+        // Calculate distance to mouse
+        const dx = mouseX - this.x;
+        const dy = mouseY - this.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        
+        // Interactive radius based on mouse proximity
+        if (distance < 150) {
+            this.targetRadius = this.baseRadius * (1 + (150 - distance) / 30);
+            
+            // Add repulsion effect
+            const angle = Math.atan2(dy, dx);
+            const force = (150 - distance) * 0.003;
+            this.vx -= Math.cos(angle) * force;
+            this.vy -= Math.sin(angle) * force;
+        } else {
+            this.targetRadius = this.baseRadius;
+        }
+
+        // Add some natural movement
+        this.vx += (Math.random() - 0.5) * 0.01;
+        this.vy += (Math.random() - 0.5) * 0.01;
+        
+        // Limit velocity
+        const maxSpeed = 2;
+        const speed = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
+        if (speed > maxSpeed) {
+            this.vx = (this.vx / speed) * maxSpeed;
+            this.vy = (this.vy / speed) * maxSpeed;
+        }
     }
 
     draw() {
@@ -174,35 +209,21 @@ function animate() {
                 ctx.beginPath();
                 ctx.moveTo(node.x, node.y);
                 ctx.lineTo(otherNode.x, otherNode.y);
-                ctx.strokeStyle = `rgba(46, 204, 113, ${1 - distance / 100})`;
-                ctx.lineWidth = 0.5;
+                
+                // Make connections more visible near mouse
+                const mouseDistance = Math.min(
+                    Math.sqrt((mouseX - node.x) ** 2 + (mouseY - node.y) ** 2),
+                    Math.sqrt((mouseX - otherNode.x) ** 2 + (mouseY - otherNode.y) ** 2)
+                );
+                const opacity = mouseDistance < 150 
+                    ? Math.min(1, (1 - distance / 100) * 1.5)
+                    : 1 - distance / 100;
+                
+                ctx.strokeStyle = `rgba(46, 204, 113, ${opacity})`;
+                ctx.lineWidth = mouseDistance < 150 ? 1 : 0.5;
                 ctx.stroke();
             }
         });
-
-        // Interactive effect with mouse
-        const dx = mouseX - node.x;
-        const dy = mouseY - node.y;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-        
-        if (distance < 150) {
-            const angle = Math.atan2(dy, dx);
-            const force = (150 - distance) * 0.01;
-            node.vx += Math.cos(angle) * force;
-            node.vy += Math.sin(angle) * force;
-            
-            // Draw connection to mouse
-            ctx.beginPath();
-            ctx.moveTo(node.x, node.y);
-            ctx.lineTo(mouseX, mouseY);
-            ctx.strokeStyle = `rgba(46, 204, 113, ${1 - distance / 150})`;
-            ctx.lineWidth = 0.5;
-            ctx.stroke();
-        }
-
-        // Apply friction
-        node.vx *= 0.99;
-        node.vy *= 0.99;
     });
 
     requestAnimationFrame(animate);
@@ -233,6 +254,8 @@ class CodeTrail {
             '&&', '||', '++', '!=', '==',
             '<>', '//', '/*', '*/'
         ];
+        this.minSize = 14;  // Minimum font size
+        this.maxSize = 24;  // Maximum font size
 
         window.addEventListener('mousemove', (e) => {
             this.mouseX = e.clientX;
@@ -253,11 +276,19 @@ class CodeTrail {
         const particle = document.createElement('div');
         particle.className = 'code-particle';
         
-        // Randomly select a code symbol and color
+        // Randomly select a code symbol, color, and size
         const symbol = this.codeSymbols[Math.floor(Math.random() * this.codeSymbols.length)];
         const color = this.colors[Math.floor(Math.random() * this.colors.length)];
+        const size = Math.floor(Math.random() * (this.maxSize - this.minSize + 1)) + this.minSize;
+        
         particle.textContent = symbol;
         particle.style.color = color;
+        particle.style.fontSize = `${size}px`;
+        
+        // Add dynamic glow effect
+        const glowIntensity = Math.random() * 2 + 1; // Random intensity between 1-3
+        particle.style.textShadow = `0 0 ${8 * glowIntensity}px ${color}`;
+        particle.style.filter = `brightness(${1 + (glowIntensity * 0.2)})`;
         
         // Add some random offset to particle position
         const offsetX = (Math.random() - 0.5) * 20;
