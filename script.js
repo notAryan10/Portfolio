@@ -1,6 +1,6 @@
 // Initialize AOS (Animate On Scroll)
 AOS.init({
-    duration: 1000,
+    duration: 3000,
     once: true
 });
 
@@ -12,7 +12,7 @@ let typewriterElement = document.querySelector('.typewriter');
 
 function typeWriter() {
     const currentText = text.substring(0, index);
-    typewriterElement.textContent = currentText + '|';
+    typewriterElement.textContent = currentText + '•';
 
     if (!isDeleting && index < text.length) {
         index++;
@@ -28,7 +28,6 @@ function typeWriter() {
 
 typeWriter();
 
-// Mobile menu toggle
 const burger = document.querySelector('.burger');
 const nav = document.querySelector('.nav-links');
 const navLinks = document.querySelectorAll('.nav-links li');
@@ -48,7 +47,6 @@ burger.addEventListener('click', () => {
     burger.classList.toggle('toggle');
 });
 
-// Smooth scrolling for navigation links
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
         e.preventDefault();
@@ -81,20 +79,6 @@ function resizeCanvas() {
 resizeCanvas();
 window.addEventListener('resize', resizeCanvas);
 
-// Mouse trail effect
-class Trail {
-    constructor(x, y) {
-        this.x = x;
-        this.y = y;
-        this.size = 2;
-        this.alpha = 1;
-        this.hue = Math.random() * 30; // Slight color variation
-    }
-}
-
-const trail = [];
-const maxTrailLength = 50;
-
 // Node class
 class Node {
     constructor() {
@@ -103,18 +87,28 @@ class Node {
         this.vx = (Math.random() - 0.5) * 0.5;
         this.vy = (Math.random() - 0.5) * 0.5;
         this.radius = Math.random() * 1.5;
-        this.baseRadius = this.radius;  // Store original radius
-        this.targetRadius = this.radius;  // For smooth radius transitions
+        this.baseRadius = this.radius;  
+        this.targetRadius = this.radius;  
+        this.color = this.getRandomColor();
+    }
+
+    getRandomColor() {
+        const colors = [
+            '#2196F3', // blue
+            '#9C27B0', // purple
+            '#f0db4f', // JavaScript yellow
+            '#FF5722', // orange
+            '#4CAF50'  // green
+        ];
+        return colors[Math.floor(Math.random() * colors.length)];
     }
 
     update() {
-        // Smooth radius transition
         this.radius += (this.targetRadius - this.radius) * 0.1;
 
         this.x += this.vx;
         this.y += this.vy;
 
-        // Bounce off edges
         if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
         if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
 
@@ -135,24 +129,12 @@ class Node {
         } else {
             this.targetRadius = this.baseRadius;
         }
-
-        // Add some natural movement
-        this.vx += (Math.random() - 0.5) * 0.01;
-        this.vy += (Math.random() - 0.5) * 0.01;
-        
-        // Limit velocity
-        const maxSpeed = 2;
-        const speed = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
-        if (speed > maxSpeed) {
-            this.vx = (this.vx / speed) * maxSpeed;
-            this.vy = (this.vy / speed) * maxSpeed;
-        }
     }
 
     draw() {
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-        ctx.fillStyle = '#2ecc71';
+        ctx.fillStyle = this.color;
         ctx.fill();
     }
 }
@@ -166,38 +148,15 @@ let mouseY = 0;
 canvas.addEventListener('mousemove', (e) => {
     mouseX = e.clientX;
     mouseY = e.clientY;
-    
-    // Add new trail point
-    trail.push(new Trail(mouseX, mouseY));
-    if (trail.length > maxTrailLength) {
-        trail.shift();
-    }
 });
 
 // Animation
 function animate() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
-    // Draw trail
-    for (let i = 0; i < trail.length - 1; i++) {
-        const point = trail[i];
-        const nextPoint = trail[i + 1];
-        
-        ctx.beginPath();
-        ctx.moveTo(point.x, point.y);
-        ctx.lineTo(nextPoint.x, nextPoint.y);
-        
-        const alpha = i / trail.length;
-        ctx.strokeStyle = `rgba(46, 204, 113, ${alpha * 0.5})`;
-        ctx.lineWidth = (i / trail.length) * 4;
-        ctx.lineCap = 'round';
-        ctx.stroke();
-    }
-    
     // Update and draw nodes
     nodes.forEach(node => {
         node.update();
-        node.draw();
         
         // Draw connections
         nodes.forEach(otherNode => {
@@ -215,15 +174,18 @@ function animate() {
                     Math.sqrt((mouseX - node.x) ** 2 + (mouseY - node.y) ** 2),
                     Math.sqrt((mouseX - otherNode.x) ** 2 + (mouseY - otherNode.y) ** 2)
                 );
+                
                 const opacity = mouseDistance < 150 
                     ? Math.min(1, (1 - distance / 100) * 1.5)
                     : 1 - distance / 100;
                 
-                ctx.strokeStyle = `rgba(46, 204, 113, ${opacity})`;
+                ctx.strokeStyle = `rgba(33, 150, 243, ${opacity})`;
                 ctx.lineWidth = mouseDistance < 150 ? 1 : 0.5;
                 ctx.stroke();
             }
         });
+        
+        node.draw();
     });
 
     requestAnimationFrame(animate);
@@ -231,122 +193,153 @@ function animate() {
 
 animate();
 
-// Code-themed particle trail effect
-class CodeTrail {
-    constructor() {
-        this.particles = [];
-        this.maxParticles = 8;
-        this.mouseX = 0;
-        this.mouseY = 0;
-        // Add array of programming-themed colors
-        this.colors = [
-            '#2ecc71',  // Green (original color)
-            '#3498db',  // Blue
-            '#e74c3c',  // Red
-            '#f1c40f',  // Yellow
-            '#9b59b6',  // Purple
-            '#1abc9c',  // Turquoise
-            '#e67e22',  // Orange
-            '#00ff99'   // Bright mint
-        ];
-        this.codeSymbols = [
-            '0', '1', '{', '}', '()', '=>', 
-            '&&', '||', '++', '!=', '==',
-            '<>', '//', '/*', '*/'
-        ];
-        this.minSize = 14;  // Minimum font size
-        this.maxSize = 24;  // Maximum font size
+// Mouse trail effect
+function createTrailParticle(x, y) {
+    const colors = [
+        '#f0db4f', // JavaScript yellow (more frequent)
+        '#f0db4f', // Added twice to increase frequency
+        '#2196F3', // blue
+        '#9C27B0', // purple
+        '#009688'  // teal
+    ];
+    const characters = '<>{}[]()=/+-*#@!';
+    const particle = document.createElement('div');
+    particle.className = 'code-particle';
+    particle.style.left = x + 'px';
+    particle.style.top = y + 'px';
+    particle.style.color = colors[Math.floor(Math.random() * colors.length)];
+    particle.textContent = characters[Math.floor(Math.random() * characters.length)];
+    
+    document.body.appendChild(particle);
 
-        window.addEventListener('mousemove', (e) => {
-            this.mouseX = e.clientX;
-            this.mouseY = e.clientY;
-            this.createParticle();
-        });
-
-        this.animate = this.animate.bind(this);
-        requestAnimationFrame(this.animate);
-    }
-
-    createParticle() {
-        if (this.particles.length >= this.maxParticles) {
-            const oldestParticle = this.particles.shift();
-            oldestParticle.element.remove();
+    // Animate and remove the particle
+    let opacity = 1;
+    let posY = y;
+    
+    const animate = () => {
+        opacity -= 0.02;
+        posY -= 1;
+        
+        particle.style.opacity = opacity;
+        particle.style.top = posY + 'px';
+        
+        if (opacity > 0) {
+            requestAnimationFrame(animate);
+        } else {
+            particle.remove();
         }
+    };
+    
+    requestAnimationFrame(animate);
+}
 
+// Track mouse movement
+let lastX = 0;
+let lastY = 0;
+let throttleTimer;
+
+document.addEventListener('mousemove', (e) => {
+    if (!throttleTimer) {
+        throttleTimer = setTimeout(() => {
+            const dx = e.clientX - lastX;
+            const dy = e.clientY - lastY;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            
+            if (distance > 20) { // Only create particle after some movement
+                createTrailParticle(e.clientX, e.clientY);
+                lastX = e.clientX;
+                lastY = e.clientY;
+            }
+            
+            throttleTimer = null;
+        }, 50); // Throttle to create particle every 50ms
+    }
+});
+
+// Add interactive particle burst on click
+document.addEventListener('click', (e) => {
+    createParticleBurst(e.clientX, e.clientY);
+});
+
+function createParticleBurst(x, y) {
+    const particleCount = 8;
+    const angleStep = (2 * Math.PI) / particleCount;
+    const colors = ['#2196F3', '#9C27B0', '#f0db4f', '#FF5722', '#4CAF50'];
+
+    for (let i = 0; i < particleCount; i++) {
         const particle = document.createElement('div');
         particle.className = 'code-particle';
+        particle.style.left = x + 'px';
+        particle.style.top = y + 'px';
+        particle.style.color = colors[Math.floor(Math.random() * colors.length)];
+        particle.textContent = '•';
         
-        // Randomly select a code symbol, color, and size
-        const symbol = this.codeSymbols[Math.floor(Math.random() * this.codeSymbols.length)];
-        const color = this.colors[Math.floor(Math.random() * this.colors.length)];
-        const size = Math.floor(Math.random() * (this.maxSize - this.minSize + 1)) + this.minSize;
-        
-        particle.textContent = symbol;
-        particle.style.color = color;
-        particle.style.fontSize = `${size}px`;
-        
-        // Add dynamic glow effect
-        const glowIntensity = Math.random() * 2 + 1; // Random intensity between 1-3
-        particle.style.textShadow = `0 0 ${8 * glowIntensity}px ${color}`;
-        particle.style.filter = `brightness(${1 + (glowIntensity * 0.2)})`;
-        
-        // Add some random offset to particle position
-        const offsetX = (Math.random() - 0.5) * 20;
-        const offsetY = (Math.random() - 0.5) * 20;
-        
-        particle.style.left = (this.mouseX + offsetX) + 'px';
-        particle.style.top = (this.mouseY + offsetY) + 'px';
         document.body.appendChild(particle);
 
-        const initialScale = 1;
-        const finalScale = 0;
-        let currentScale = initialScale;
+        const angle = i * angleStep;
+        const velocity = 5;
+        const vx = Math.cos(angle) * velocity;
+        const vy = Math.sin(angle) * velocity;
         
-        // Random rotation for more dynamic effect
-        const rotation = Math.random() * 360;
-        particle.style.transform = `scale(${initialScale}) rotate(${rotation}deg)`;
-
-        this.particles.push({
-            element: particle,
-            initialX: this.mouseX + offsetX,
-            initialY: this.mouseY + offsetY,
-            rotation: rotation,
-            scale: currentScale,
-            updateScale: () => {
-                currentScale -= 0.015;
-                if (currentScale <= finalScale) {
-                    currentScale = finalScale;
-                }
-                return currentScale;
-            }
-        });
-    }
-
-    animate() {
-        this.particles.forEach((particle, index) => {
-            const scale = particle.updateScale();
-            if (scale <= 0) {
-                particle.element.remove();
-                this.particles.splice(index, 1);
+        let posX = x;
+        let posY = y;
+        let opacity = 1;
+        
+        const animate = () => {
+            opacity -= 0.02;
+            posX += vx;
+            posY += vy;
+            
+            particle.style.opacity = opacity;
+            particle.style.left = posX + 'px';
+            particle.style.top = posY + 'px';
+            
+            if (opacity > 0) {
+                requestAnimationFrame(animate);
             } else {
-                particle.element.style.transform = 
-                    `scale(${scale}) rotate(${particle.rotation}deg)`;
-                particle.element.style.opacity = scale;
-                
-                particle.initialY -= 0.5;
-                particle.element.style.top = particle.initialY + 'px';
+                particle.remove();
             }
-        });
-
-        requestAnimationFrame(this.animate);
+        };
+        
+        requestAnimationFrame(animate);
     }
 }
 
-// Initialize AOS and the code trail effect
-document.addEventListener('DOMContentLoaded', () => {
-    AOS.init({
-        duration: 3000,
-        once: true
+// Add magnetic effect to buttons
+document.querySelectorAll('.btn').forEach(btn => {
+    btn.addEventListener('mousemove', (e) => {
+        const rect = btn.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        
+        btn.style.transform = `translate(
+            ${(x - rect.width / 2) / 10}px, 
+            ${(y - rect.height / 2) / 10}px
+        )`;
     });
-    new CodeTrail();
+
+    btn.addEventListener('mouseleave', () => {
+        btn.style.transform = '';
+    });
+});
+
+// Add tilt effect to project cards
+document.querySelectorAll('.project-card').forEach(card => {
+    card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        
+        const rotateX = (y - centerY) / 20;
+        const rotateY = -(x - centerX) / 20;
+        
+        card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+    });
+
+    card.addEventListener('mouseleave', () => {
+        card.style.transform = '';
+    });
 }); 
