@@ -45,11 +45,11 @@
     <nav class="navbar">
         <div class="logo">AV</div>
         <ul class="nav-links">
-            <li><a href="#home">Home</a></li>
-            <li><a href="#about">About</a></li>
-            <li><a href="#projects">Projects</a></li>
-            <li><a href="#skills">Skills</a></li>
-            <li><a href="#contact">Contact</a></li>
+            <li><a href="#home" data-tooltip="Home">Home</a></li>
+            <li><a href="#about" data-tooltip="About Me">About</a></li>
+            <li><a href="#projects" data-tooltip="My Projects">Projects</a></li>
+            <li><a href="#skills" data-tooltip="My Skills">Skills</a></li>
+            <li><a href="#contact" data-tooltip="Contact Me">Contact</a></li>
         </ul>
         <div class="burger">
             <div class="line1"></div>
@@ -63,10 +63,34 @@
             <h1>Aryan Verma</h1>
             <p class="typewriter">Software Developer | Problem Solver</p>
             <div class="social-links">
-                <a href="https://www.linkedin.com/in/aryan-verma100806/" target="_blank" rel="noopener" aria-label="LinkedIn Profile"><i class="fab fa-linkedin"></i></a>
-                <a href="https://github.com/notAryan10" target="_blank" rel="noopener" aria-label="GitHub Profile"><i class="fab fa-github"></i></a>
-                <a href="https://codeforces.com/profile/aryan.verma1008" target="_blank" rel="noopener" aria-label="CodeForces Profile"><i class="fas fa-code"></i></a>
-                <a href="https://leetcode.com/u/notaryan10/" target="_blank" rel="noopener" aria-label="LeetCode Profile"><i class="fas fa-laptop-code"></i></a>
+                <a href="https://www.linkedin.com/in/aryan-verma100806/" 
+                   target="_blank" 
+                   rel="noopener" 
+                   aria-label="LinkedIn Profile"
+                   data-tooltip="LinkedIn">
+                    <i class="fab fa-linkedin"></i>
+                </a>
+                <a href="https://github.com/notAryan10" 
+                   target="_blank" 
+                   rel="noopener" 
+                   aria-label="GitHub Profile"
+                   data-tooltip="GitHub">
+                    <i class="fab fa-github"></i>
+                </a>
+                <a href="https://codeforces.com/profile/aryan.verma1008" 
+                   target="_blank" 
+                   rel="noopener" 
+                   aria-label="CodeForces Profile"
+                   data-tooltip="CodeForces">
+                    <i class="fas fa-code"></i>
+                </a>
+                <a href="https://leetcode.com/u/notaryan10/" 
+                   target="_blank" 
+                   rel="noopener" 
+                   aria-label="LeetCode Profile"
+                   data-tooltip="LeetCode">
+                    <i class="fas fa-laptop-code"></i>
+                </a>
             </div>
         </div>
     </section>
@@ -111,8 +135,16 @@
                 </div>
                 <p>A modern web application featuring dynamic UI components and responsive design patterns. Implemented custom animations and interactive elements to enhance user experience.</p>
                 <div class="project-links">
-                    <a href="https://hyperlume.greenhacker.tech/" class="btn" target="_blank" rel="noopener">Live Demo</a>
-                    <a href="https://github.com/notAryan10/Hyperlume" class="btn" target="_blank" rel="noopener">View Code</a>
+                    <a href="https://hyperlume.greenhacker.tech/" 
+                       class="btn" 
+                       target="_blank" 
+                       rel="noopener"
+                       data-tooltip="View Live Demo">Live Demo</a>
+                    <a href="https://github.com/notAryan10/Hyperlume" 
+                       class="btn" 
+                       target="_blank" 
+                       rel="noopener"
+                       data-tooltip="View Source Code">View Code</a>
                 </div>
             </div>
 
@@ -156,11 +188,11 @@
             <div class="skills-category">
                 <h3>Frontend Development</h3>
                 <div class="skills-grid">
-                    <div class="skill-item">
+                    <div class="skill-item" data-tooltip="HTML5 - Structure and Semantics">
                         <i class="fab fa-html5"></i>
                         <p>HTML5</p>
                     </div>
-                    <div class="skill-item">
+                    <div class="skill-item" data-tooltip="CSS3 - Styling and Animations">
                         <i class="fab fa-css3-alt"></i>
                         <p>CSS3</p>
                     </div>

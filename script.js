@@ -174,28 +174,38 @@ function animate() {
     nodes.forEach(node => {
         node.update();
         
-        // Draw connections with smoother transitions
         nodes.forEach(otherNode => {
             const dx = node.x - otherNode.x;
             const dy = node.y - otherNode.y;
             const distance = Math.sqrt(dx * dx + dy * dy);
             
-            if (distance < 120) { // Increased connection distance
-                ctx.beginPath();
-                ctx.moveTo(node.x, node.y);
-                ctx.lineTo(otherNode.x, otherNode.y);
-                
+            if (distance < 120) {
+                // Calculate mouseDistance once
                 const mouseDistance = Math.min(
                     Math.sqrt((mouseX - node.x) ** 2 + (mouseY - node.y) ** 2),
                     Math.sqrt((mouseX - otherNode.x) ** 2 + (mouseY - otherNode.y) ** 2)
                 );
                 
+                // Apply glow effect
+                if (mouseDistance < 150) {
+                    ctx.shadowBlur = 5;
+                    ctx.shadowColor = 'rgba(33, 150, 243, 0.5)';
+                } else {
+                    ctx.shadowBlur = 0;
+                }
+                
+                // Draw connection line
+                ctx.beginPath();
+                ctx.moveTo(node.x, node.y);
+                ctx.lineTo(otherNode.x, otherNode.y);
+                
+                // Calculate opacity based on mouseDistance
                 const opacity = mouseDistance < 150 
-                    ? Math.min(0.5, (1 - distance / 120) * 0.8) // Reduced opacity
-                    : (1 - distance / 120) * 0.3; // Even lower base opacity
+                    ? Math.min(0.5, (1 - distance / 120) * 0.8)
+                    : (1 - distance / 120) * 0.3;
                 
                 ctx.strokeStyle = `rgba(33, 150, 243, ${opacity})`;
-                ctx.lineWidth = mouseDistance < 150 ? 0.8 : 0.3; // Thinner lines
+                ctx.lineWidth = mouseDistance < 150 ? 0.8 : 0.3;
                 ctx.stroke();
             }
         });
@@ -447,4 +457,70 @@ document.addEventListener('mouseenter', () => {
     trails.forEach((trail, index) => {
         trail.element.style.opacity = 1 - (index * 0.15);
     });
+});
+
+// Add click interaction
+canvas.addEventListener('click', (e) => {
+    const clickX = e.clientX;
+    const clickY = e.clientY;
+    
+    // Create ripple effect
+    createRipple(clickX, clickY);
+    
+    // Push particles away from click
+    nodes.forEach(node => {
+        const dx = node.x - clickX;
+        const dy = node.y - clickY;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        
+        if (distance < 200) {
+            const angle = Math.atan2(dy, dx);
+            const force = (200 - distance) * 0.02;
+            node.vx += Math.cos(angle) * force;
+            node.vy += Math.sin(angle) * force;
+        }
+    });
+});
+
+// Ripple effect
+function createRipple(x, y) {
+    let radius = 0;
+    let opacity = 1;
+    
+    function drawRipple() {
+        ctx.beginPath();
+        ctx.arc(x, y, radius, 0, Math.PI * 2);
+        ctx.strokeStyle = `rgba(33, 150, 243, ${opacity})`;
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        
+        radius += 5;
+        opacity -= 0.02;
+        
+        if (opacity > 0) {
+            requestAnimationFrame(drawRipple);
+        }
+    }
+    
+    drawRipple();
+}
+
+// Add hover interaction zone
+let hoverZone = {
+    x: 0,
+    y: 0,
+    radius: 150,
+    active: false
+};
+
+canvas.addEventListener('mousemove', (e) => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+    hoverZone.x = e.clientX;
+    hoverZone.y = e.clientY;
+    hoverZone.active = true;
+});
+
+canvas.addEventListener('mouseleave', () => {
+    hoverZone.active = false;
 }); 

@@ -135,7 +135,12 @@ body {
     color: var(--text-light);
     font-size: 1.5rem;
     margin: 0 1rem;
-    transition: color 0.3s ease;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.social-links a:hover {
+    transform: translateY(-3px);
 }
 
 .social-links a:nth-child(1):hover { color: var(--primary-blue); }
@@ -171,26 +176,40 @@ h2 {
     border-radius: 10px;
     border: 1px solid transparent;
     transition: all 0.3s ease;
-    animation: float 4s ease-in-out infinite;
+    position: relative;
+    overflow: hidden;
+}
+
+.project-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        45deg,
+        transparent,
+        rgba(33, 150, 243, 0.1),
+        transparent
+    );
+    transform: translateX(-100%);
+    transition: transform 0.6s ease;
 }
 
 .project-card:hover {
-    transform: scale(1.05);
+    transform: translateY(-5px);
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
 }
 
-.project-card:nth-child(1) { border-color: var(--primary-blue); }
-.project-card:nth-child(2) { border-color: var(--primary-purple); }
-.project-card:nth-child(3) { border-color: var(--primary-teal); }
+.project-card:hover::before {
+    transform: translateX(100%);
+}
 
 .project-card h3 {
     color: var(--primary-blue);
     margin-bottom: 1rem;
 }
-
-.project-card:nth-child(1) h3 { color: var(--primary-blue); }
-.project-card:nth-child(2) h3 { color: var(--primary-purple); }
-.project-card:nth-child(3) h3 { color: var(--primary-teal); }
 
 .project-links {
     margin-top: 1.5rem;
@@ -199,14 +218,10 @@ h2 {
 }
 
 .btn {
-    display: inline-block;
-    padding: 0.5rem 1rem;
-    background: var(--primary-blue);
-    color: var(--text-light);
-    text-decoration: none;
-    border-radius: 5px;
     transition: all 0.3s ease;
     position: relative;
+    overflow: hidden;
+    z-index: 1;
 }
 
 .btn::before {
@@ -222,20 +237,17 @@ h2 {
         rgba(255, 255, 255, 0.2),
         transparent
     );
-    transition: 0.5s;
+    transition: transform 0.6s ease;
+    z-index: -1;
 }
-
-.btn:hover::before {
-    left: 100%;
-}
-
-.project-card:nth-child(1) .btn { background: var(--primary-blue); }
-.project-card:nth-child(2) .btn { background: var(--primary-purple); }
-.project-card:nth-child(3) .btn { background: var(--primary-teal); }
 
 .btn:hover {
     transform: translateY(-2px);
     box-shadow: 0 5px 15px rgba(33, 150, 243, 0.3);
+}
+
+.btn:hover::before {
+    transform: translateX(200%);
 }
 
 /* Skills */
@@ -247,67 +259,31 @@ h2 {
 }
 
 .skill-item {
-    background: var(--card-background);
-    padding: 2rem;
-    border-radius: 10px;
-    border: 1px solid transparent;
     transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(5px);
+    background: var(--card-background);
+    border-radius: 8px;
+    padding: 1rem;
 }
 
 .skill-item:hover {
-    transform: translateY(-10px);
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(33, 150, 243, 0.2);
+    background: linear-gradient(
+        145deg,
+        var(--card-background),
+        rgba(33, 150, 243, 0.1)
+    );
 }
 
-.skill-item:nth-child(1) { border-color: var(--primary-blue); }
-.skill-item:nth-child(2) { border-color: var(--primary-purple); }
-.skill-item:nth-child(3) { border-color: var(--primary-teal); }
-.skill-item:nth-child(4) { border-color: var(--primary-orange); }
-.skill-item:nth-child(5) { border-color: var(--primary-green); }
+.skill-item:hover i {
+    transform: scale(1.1);
+    color: var(--primary-blue);
+}
 
 .skill-item i {
     font-size: 3rem;
     color: var(--primary-blue);
     margin-bottom: 1rem;
-}
-
-.skill-item:nth-child(1) i { color: var(--primary-blue); }
-.skill-item:nth-child(2) i { color: var(--primary-purple); }
-.skill-item:nth-child(3) i { color: var(--primary-teal); }
-.skill-item:nth-child(4) i { color: var(--primary-orange); }
-.skill-item:nth-child(5) i { color: var(--primary-green); }
-
-/* Update JavaScript icon color */
-.skill-item:nth-child(3) i { 
-    color: var(--js-yellow); 
-}
-
-/* Update JavaScript card border */
-.skill-item:nth-child(3) { 
-    border-color: var(--js-yellow); 
-}
-
-.skill-item::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(
-        90deg,
-        transparent,
-        rgba(255, 255, 255, 0.1),
-        transparent
-    );
-    transition: 0.5s;
-}
-
-.skill-item:hover::before {
-    left: 100%;
 }
 
 /* Contact */
@@ -421,18 +397,31 @@ footer {
 
 /* Interactive navigation links */
 .nav-links a {
+    color: var(--text-light);
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
     position: relative;
+    padding-bottom: 5px;
 }
 
 .nav-links a::after {
     content: '';
     position: absolute;
-    bottom: -5px;
+    bottom: 0;
     left: 0;
     width: 0;
     height: 2px;
-    background: var(--primary-blue);
+    background: linear-gradient(
+        90deg,
+        var(--primary-blue),
+        var(--primary-purple)
+    );
     transition: width 0.3s ease;
+}
+
+.nav-links a:hover {
+    color: var(--primary-blue);
 }
 
 .nav-links a:hover::after {
@@ -508,4 +497,218 @@ button:hover ~ .custom-cursor,
     transform: translate(-50%, -50%) scale(1.5);
     background: rgba(33, 150, 243, 0.1);
     border-color: var(--primary-purple);
+}
+
+/* Add these styles for the tooltips */
+.social-links a::before {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: -40px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 14px;
+    background: var(--primary-blue);
+    color: white;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 1000;
+}
+
+.social-links a::after {
+    content: '';
+    position: absolute;
+    bottom: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-bottom-color: var(--primary-blue);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    pointer-events: none;
+}
+
+.social-links a:hover::before,
+.social-links a:hover::after {
+    opacity: 1;
+    visibility: visible;
+}
+
+.social-links a:hover::before {
+    bottom: -35px;
+}
+
+.social-links a:hover::after {
+    bottom: -10px;
+}
+
+/* Add general tooltip styles */
+[data-tooltip] {
+    position: relative;
+}
+
+[data-tooltip]::before {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 14px;
+    background: var(--primary-blue);
+    color: white;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 1000;
+}
+
+[data-tooltip]::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-bottom-color: var(--primary-blue);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    pointer-events: none;
+}
+
+[data-tooltip]:hover::before,
+[data-tooltip]:hover::after {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Specific positioning for different elements */
+.nav-links a[data-tooltip]::before {
+    bottom: -40px;
+}
+
+.nav-links a[data-tooltip]::after {
+    bottom: -15px;
+}
+
+.nav-links a[data-tooltip]:hover::before {
+    bottom: -35px;
+}
+
+.nav-links a[data-tooltip]:hover::after {
+    bottom: -10px;
+}
+
+.btn[data-tooltip]::before {
+    bottom: -40px;
+}
+
+.btn[data-tooltip]::after {
+    bottom: -15px;
+}
+
+.btn[data-tooltip]:hover::before {
+    bottom: -35px;
+}
+
+.btn[data-tooltip]:hover::after {
+    bottom: -10px;
+}
+
+.skill-item[data-tooltip]::before {
+    bottom: auto;
+    top: -40px;
+    font-size: 12px;
+    width: max-content;
+    max-width: 200px;
+    text-align: center;
+}
+
+.skill-item[data-tooltip]::after {
+    bottom: auto;
+    top: -15px;
+    border-bottom-color: transparent;
+    border-top-color: var(--primary-blue);
+}
+
+.skill-item[data-tooltip]:hover::before {
+    top: -45px;
+}
+
+.skill-item[data-tooltip]:hover::after {
+    top: -20px;
+}
+
+/* Different colors for different sections */
+.project-card:nth-child(1) .btn[data-tooltip]::before,
+.project-card:nth-child(1) .btn[data-tooltip]::after {
+    background-color: var(--primary-blue);
+    border-bottom-color: var(--primary-blue);
+}
+
+.project-card:nth-child(2) .btn[data-tooltip]::before,
+.project-card:nth-child(2) .btn[data-tooltip]::after {
+    background-color: var(--primary-purple);
+    border-bottom-color: var(--primary-purple);
+}
+
+.project-card:nth-child(3) .btn[data-tooltip]::before,
+.project-card:nth-child(3) .btn[data-tooltip]::after {
+    background-color: var(--primary-teal);
+    border-bottom-color: var(--primary-teal);
+}
+
+/* Update the link styles */
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+/* Update social links styles */
+.social-links a {
+    color: var(--text-light);
+    font-size: 1.5rem;
+    margin: 0 1rem;
+    transition: all 0.3s ease;
+    position: relative;
+    text-decoration: none;
+}
+
+/* Update nav links styles */
+.nav-links a {
+    color: var(--text-light);
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    position: relative;
+    padding-bottom: 5px;
+}
+
+/* Update footer links styles */
+.footer-links a {
+    text-decoration: none;
+    color: var(--text-secondary);
+    margin: 0 1rem;
+    transition: color 0.3s ease;
+}
+
+/* Update contact links styles */
+.contact-info a {
+    text-decoration: none;
+    color: var(--text-secondary);
+    transition: color 0.3s ease;
+}
+
+/* Update project links styles */
+.project-links a {
+    text-decoration: none;
 } 
