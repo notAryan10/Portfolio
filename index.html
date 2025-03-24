@@ -7,6 +7,27 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <style>
+        .trail-particle {
+            pointer-events: none;
+            position: fixed;
+            width: 8px;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            z-index: 9999;
+        }
+        .code-particle {
+            pointer-events: none;
+            position: fixed;
+            color: #2ecc71;
+            font-family: monospace;
+            font-size: 16px;
+            z-index: 9999;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
 </head>
 <body>
     <canvas id="networkCanvas"></canvas>

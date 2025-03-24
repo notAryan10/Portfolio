@@ -208,4 +208,114 @@ function animate() {
     requestAnimationFrame(animate);
 }
 
-animate(); 
+animate();
+
+// Code-themed particle trail effect
+class CodeTrail {
+    constructor() {
+        this.particles = [];
+        this.maxParticles = 8;
+        this.mouseX = 0;
+        this.mouseY = 0;
+        // Add array of programming-themed colors
+        this.colors = [
+            '#2ecc71',  // Green (original color)
+            '#3498db',  // Blue
+            '#e74c3c',  // Red
+            '#f1c40f',  // Yellow
+            '#9b59b6',  // Purple
+            '#1abc9c',  // Turquoise
+            '#e67e22',  // Orange
+            '#00ff99'   // Bright mint
+        ];
+        this.codeSymbols = [
+            '0', '1', '{', '}', '()', '=>', 
+            '&&', '||', '++', '!=', '==',
+            '<>', '//', '/*', '*/'
+        ];
+
+        window.addEventListener('mousemove', (e) => {
+            this.mouseX = e.clientX;
+            this.mouseY = e.clientY;
+            this.createParticle();
+        });
+
+        this.animate = this.animate.bind(this);
+        requestAnimationFrame(this.animate);
+    }
+
+    createParticle() {
+        if (this.particles.length >= this.maxParticles) {
+            const oldestParticle = this.particles.shift();
+            oldestParticle.element.remove();
+        }
+
+        const particle = document.createElement('div');
+        particle.className = 'code-particle';
+        
+        // Randomly select a code symbol and color
+        const symbol = this.codeSymbols[Math.floor(Math.random() * this.codeSymbols.length)];
+        const color = this.colors[Math.floor(Math.random() * this.colors.length)];
+        particle.textContent = symbol;
+        particle.style.color = color;
+        
+        // Add some random offset to particle position
+        const offsetX = (Math.random() - 0.5) * 20;
+        const offsetY = (Math.random() - 0.5) * 20;
+        
+        particle.style.left = (this.mouseX + offsetX) + 'px';
+        particle.style.top = (this.mouseY + offsetY) + 'px';
+        document.body.appendChild(particle);
+
+        const initialScale = 1;
+        const finalScale = 0;
+        let currentScale = initialScale;
+        
+        // Random rotation for more dynamic effect
+        const rotation = Math.random() * 360;
+        particle.style.transform = `scale(${initialScale}) rotate(${rotation}deg)`;
+
+        this.particles.push({
+            element: particle,
+            initialX: this.mouseX + offsetX,
+            initialY: this.mouseY + offsetY,
+            rotation: rotation,
+            scale: currentScale,
+            updateScale: () => {
+                currentScale -= 0.015;
+                if (currentScale <= finalScale) {
+                    currentScale = finalScale;
+                }
+                return currentScale;
+            }
+        });
+    }
+
+    animate() {
+        this.particles.forEach((particle, index) => {
+            const scale = particle.updateScale();
+            if (scale <= 0) {
+                particle.element.remove();
+                this.particles.splice(index, 1);
+            } else {
+                particle.element.style.transform = 
+                    `scale(${scale}) rotate(${particle.rotation}deg)`;
+                particle.element.style.opacity = scale;
+                
+                particle.initialY -= 0.5;
+                particle.element.style.top = particle.initialY + 'px';
+            }
+        });
+
+        requestAnimationFrame(this.animate);
+    }
+}
+
+// Initialize AOS and the code trail effect
+document.addEventListener('DOMContentLoaded', () => {
+    AOS.init({
+        duration: 3000,
+        once: true
+    });
+    new CodeTrail();
+}); 
