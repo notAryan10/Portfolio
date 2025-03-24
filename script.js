@@ -84,12 +84,14 @@ class Node {
     constructor() {
         this.x = Math.random() * canvas.width;
         this.y = Math.random() * canvas.height;
-        this.vx = (Math.random() - 0.5) * 0.5;
-        this.vy = (Math.random() - 0.5) * 0.5;
-        this.radius = Math.random() * 1.5;
+        this.vx = (Math.random() - 0.5) * 0.2;
+        this.vy = (Math.random() - 0.5) * 0.2;
+        this.radius = Math.random() * 1.2;
         this.baseRadius = this.radius;  
-        this.targetRadius = this.radius;  
+        this.targetRadius = this.radius;
         this.color = this.getRandomColor();
+        this.currentOpacity = 0;
+        this.targetOpacity = 0.7;
     }
 
     getRandomColor() {
@@ -104,28 +106,42 @@ class Node {
     }
 
     update() {
-        this.radius += (this.targetRadius - this.radius) * 0.1;
-
+        this.radius += (this.targetRadius - this.radius) * 0.05;
+        
         this.x += this.vx;
         this.y += this.vy;
 
-        if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
-        if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+        this.currentOpacity += (this.targetOpacity - this.currentOpacity) * 0.05;
 
-        // Calculate distance to mouse
+        if (this.x < 0 || this.x > canvas.width) {
+            this.vx *= -0.8;
+            if (this.x < 0) this.x = 0;
+            if (this.x > canvas.width) this.x = canvas.width;
+        }
+        if (this.y < 0 || this.y > canvas.height) {
+            this.vy *= -0.8;
+            if (this.y < 0) this.y = 0;
+            if (this.y > canvas.height) this.y = canvas.height;
+        }
+
         const dx = mouseX - this.x;
         const dy = mouseY - this.y;
         const distance = Math.sqrt(dx * dx + dy * dy);
         
-        // Interactive radius based on mouse proximity
         if (distance < 150) {
-            this.targetRadius = this.baseRadius * (1 + (150 - distance) / 30);
+            this.targetRadius = this.baseRadius * (1 + (150 - distance) / 50);
             
-            // Add repulsion effect
             const angle = Math.atan2(dy, dx);
-            const force = (150 - distance) * 0.003;
+            const force = (150 - distance) * 0.001;
             this.vx -= Math.cos(angle) * force;
             this.vy -= Math.sin(angle) * force;
+            
+            const maxVelocity = 0.5;
+            const currentVelocity = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
+            if (currentVelocity > maxVelocity) {
+                this.vx = (this.vx / currentVelocity) * maxVelocity;
+                this.vy = (this.vy / currentVelocity) * maxVelocity;
+            }
         } else {
             this.targetRadius = this.baseRadius;
         }
@@ -134,13 +150,13 @@ class Node {
     draw() {
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-        ctx.fillStyle = this.color;
+        ctx.fillStyle = this.color.replace(')', `, ${this.currentOpacity})`).replace('rgb', 'rgba');
         ctx.fill();
     }
 }
 
 // Create nodes
-const nodes = Array.from({ length: 100 }, () => new Node());
+const nodes = Array.from({ length: 70 }, () => new Node());
 let mouseX = 0;
 let mouseY = 0;
 
@@ -158,29 +174,28 @@ function animate() {
     nodes.forEach(node => {
         node.update();
         
-        // Draw connections
+        // Draw connections with smoother transitions
         nodes.forEach(otherNode => {
             const dx = node.x - otherNode.x;
             const dy = node.y - otherNode.y;
             const distance = Math.sqrt(dx * dx + dy * dy);
             
-            if (distance < 100) {
+            if (distance < 120) { // Increased connection distance
                 ctx.beginPath();
                 ctx.moveTo(node.x, node.y);
                 ctx.lineTo(otherNode.x, otherNode.y);
                 
-                // Make connections more visible near mouse
                 const mouseDistance = Math.min(
                     Math.sqrt((mouseX - node.x) ** 2 + (mouseY - node.y) ** 2),
                     Math.sqrt((mouseX - otherNode.x) ** 2 + (mouseY - otherNode.y) ** 2)
                 );
                 
                 const opacity = mouseDistance < 150 
-                    ? Math.min(1, (1 - distance / 100) * 1.5)
-                    : 1 - distance / 100;
+                    ? Math.min(0.5, (1 - distance / 120) * 0.8) // Reduced opacity
+                    : (1 - distance / 120) * 0.3; // Even lower base opacity
                 
                 ctx.strokeStyle = `rgba(33, 150, 243, ${opacity})`;
-                ctx.lineWidth = mouseDistance < 150 ? 1 : 0.5;
+                ctx.lineWidth = mouseDistance < 150 ? 0.8 : 0.3; // Thinner lines
                 ctx.stroke();
             }
         });
@@ -341,5 +356,95 @@ document.querySelectorAll('.project-card').forEach(card => {
 
     card.addEventListener('mouseleave', () => {
         card.style.transform = '';
+    });
+});
+
+// Create cursor elements
+const cursor = document.createElement('div');
+cursor.classList.add('custom-cursor');
+document.body.appendChild(cursor);
+
+// Create multiple trail elements
+const numTrails = 5;
+const trails = [];
+for (let i = 0; i < numTrails; i++) {
+    const trail = document.createElement('div');
+    trail.classList.add('cursor-trail');
+    document.body.appendChild(trail);
+    trails.push({
+        element: trail,
+        x: 0,
+        y: 0
+    });
+}
+
+// Update cursor position
+let cursorX = 0;
+let cursorY = 0;
+
+document.addEventListener('mousemove', (e) => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+});
+
+// Animate cursor and trails
+function animateCursor() {
+    // Smooth cursor movement
+    cursorX += (mouseX - cursorX) * 0.1;
+    cursorY += (mouseY - cursorY) * 0.1;
+    
+    // Update main cursor
+    cursor.style.left = `${cursorX}px`;
+    cursor.style.top = `${cursorY}px`;
+    
+    // Update trails with delay
+    trails.forEach((trail, index) => {
+        // Calculate delayed position
+        trail.x += (cursorX - trail.x) * (0.1 - index * 0.012);
+        trail.y += (cursorY - trail.y) * (0.1 - index * 0.012);
+        
+        // Apply position
+        trail.element.style.left = `${trail.x}px`;
+        trail.element.style.top = `${trail.y}px`;
+        
+        // Update size and opacity based on position in trail
+        const scale = 1 - (index * 0.15);
+        const opacity = 1 - (index * 0.15);
+        trail.element.style.transform = `translate(-50%, -50%) scale(${scale})`;
+        trail.element.style.opacity = opacity;
+    });
+    
+    requestAnimationFrame(animateCursor);
+}
+
+animateCursor();
+
+// Add cursor effects for interactive elements
+document.querySelectorAll('a, button, .project-card').forEach(element => {
+    element.addEventListener('mouseenter', () => {
+        cursor.style.transform = 'translate(-50%, -50%) scale(1.5)';
+        cursor.style.borderColor = 'var(--primary-purple)';
+        cursor.style.background = 'rgba(33, 150, 243, 0.1)';
+    });
+    
+    element.addEventListener('mouseleave', () => {
+        cursor.style.transform = 'translate(-50%, -50%) scale(1)';
+        cursor.style.borderColor = 'var(--primary-blue)';
+        cursor.style.background = 'transparent';
+    });
+});
+
+// Hide cursor when leaving the window
+document.addEventListener('mouseleave', () => {
+    cursor.style.opacity = '0';
+    trails.forEach(trail => {
+        trail.element.style.opacity = '0';
+    });
+});
+
+document.addEventListener('mouseenter', () => {
+    cursor.style.opacity = '1';
+    trails.forEach((trail, index) => {
+        trail.element.style.opacity = 1 - (index * 0.15);
     });
 }); 

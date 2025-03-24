@@ -24,6 +24,7 @@
     padding: 0;
     box-sizing: border-box;
     scroll-behavior: smooth;
+    cursor: none;  /* Hide the default cursor */
 }
 
 body {
@@ -471,4 +472,40 @@ footer {
 
 .logo:hover {
     transform: scale(1.1) rotate(5deg);
+}
+
+/* Add these styles at the beginning of your CSS file after the :root section */
+.custom-cursor {
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--primary-blue);
+    border-radius: 50%;
+    position: fixed;
+    pointer-events: none;
+    z-index: 9999;
+    transition: transform 0.2s ease;
+    transform: translate(-50%, -50%);
+    mix-blend-mode: difference;
+}
+
+.cursor-trail {
+    width: 8px;
+    height: 8px;
+    background: var(--primary-purple);
+    border-radius: 50%;
+    position: fixed;
+    pointer-events: none;
+    z-index: 9998;
+    transition: transform 0.1s ease;
+    transform: translate(-50%, -50%);
+    opacity: 0.5;
+}
+
+/* Add hover effect for interactive elements */
+a:hover ~ .custom-cursor,
+button:hover ~ .custom-cursor,
+.project-card:hover ~ .custom-cursor {
+    transform: translate(-50%, -50%) scale(1.5);
+    background: rgba(33, 150, 243, 0.1);
+    border-color: var(--primary-purple);
 } 
