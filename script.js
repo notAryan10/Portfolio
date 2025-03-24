@@ -28,23 +28,37 @@ function typeWriter() {
 
 typeWriter();
 
-const burger = document.querySelector('.burger');
-const nav = document.querySelector('.nav-links');
-const navLinks = document.querySelectorAll('.nav-links li');
+const primaryNav = document.querySelector('.nav-links');
+const navToggle = document.querySelector('.burger');
 
-burger.addEventListener('click', () => {
-    nav.classList.toggle('nav-active');
+navToggle.addEventListener('click', () => {
+    const visibility = primaryNav.getAttribute('data-visible');
     
-    navLinks.forEach((link, index) => {
-        if (link.style.animation) {
-            link.style.animation = '';
-        } else {
-            link.style.animation = `navLinkFade 0.5s ease forwards ${index / 7 + 0.3}s`;
-        }
+    if (visibility === "false") {
+        primaryNav.setAttribute('data-visible', true);
+        navToggle.setAttribute('aria-expanded', true);
+    } else {
+        primaryNav.setAttribute('data-visible', false);
+        navToggle.setAttribute('aria-expanded', false);
+    }
+});
+
+// Close menu when clicking outside
+document.addEventListener('click', (e) => {
+    if (!primaryNav.contains(e.target) && 
+        !navToggle.contains(e.target) && 
+        primaryNav.getAttribute('data-visible') === "true") {
+        primaryNav.setAttribute('data-visible', false);
+        navToggle.setAttribute('aria-expanded', false);
+    }
+});
+
+// Close menu when clicking a link
+document.querySelectorAll('.nav-links a').forEach(link => {
+    link.addEventListener('click', () => {
+        primaryNav.setAttribute('data-visible', false);
+        navToggle.setAttribute('aria-expanded', false);
     });
-    
-    // Burger animation
-    burger.classList.toggle('toggle');
 });
 
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
